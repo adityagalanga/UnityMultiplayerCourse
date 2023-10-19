@@ -59,7 +59,8 @@ public class Player : NetworkBehaviour, IKitchenObjectParent {
         {
             return;
         }
-        HandleMovementServerAuth();
+        //HandleMovementServerAuth();
+        HandleMovement();
         HandleInteractions();
     }
 
