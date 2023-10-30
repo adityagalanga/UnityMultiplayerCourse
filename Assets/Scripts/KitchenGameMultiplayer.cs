@@ -17,7 +17,30 @@ public class KitchenGameMultiplayer : NetworkBehaviour {
         Instance = this;
     }
 
+    public void StartHost()
+    {
+        NetworkManager.Singleton.ConnectionApprovalCallback += NetworkManage_ConnecteionApprovalCallback;
+        NetworkManager.Singleton.StartHost();
+    }
 
+    private void NetworkManage_ConnecteionApprovalCallback(NetworkManager.ConnectionApprovalRequest connectionApprovalRequest, NetworkManager.ConnectionApprovalResponse connectionApprovalResponse)
+    {
+        if (KitchenGameManager.Instance.IsWaitingToStart())
+        {
+            connectionApprovalResponse.Approved = true;
+            connectionApprovalResponse.CreatePlayerObject = true;
+        }
+        else
+        {
+            connectionApprovalResponse.Approved = false;
+        }
+
+    }
+
+    public void StartClient()
+    {
+        NetworkManager.Singleton.StartClient();
+    }
 
     public void SpawnKitchenObject(KitchenObjectSO kitchenObjectSO, IKitchenObjectParent kitchenObjectParent) {
         SpawnKitchenObjectServerRpc(GetKitchenObjectSOIndex(kitchenObjectSO), kitchenObjectParent.GetNetworkObject());
