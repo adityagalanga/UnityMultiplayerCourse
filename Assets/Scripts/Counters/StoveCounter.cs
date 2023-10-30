@@ -59,7 +59,11 @@ public class StoveCounter : BaseCounter, IHasProgress {
             state = state.Value
         });
 
-        if (state.Value == State.Burned || state.Value == State.Idle) {
+        if (state.Value == State.Burned || state.Value == State.Idle)
+        {
+            fryingTimer.Value = 0f;
+            burningTimer.Value = 0f;
+
             OnProgressChanged?.Invoke(this, new IHasProgress.OnProgressChangedEventArgs {
                 progressNormalized = 0f
             });
@@ -135,9 +139,9 @@ public class StoveCounter : BaseCounter, IHasProgress {
                 if (player.GetKitchenObject().TryGetPlate(out PlateKitchenObject plateKitchenObject)) {
                     // Player is holding a Plate
                     if (plateKitchenObject.TryAddIngredient(GetKitchenObject().GetKitchenObjectSO())) {
-                        GetKitchenObject().DestroySelf();
+                        KitchenObject.DestroyKitchenObject(GetKitchenObject());
 
-                        state.Value = State.Idle;
+                        SetStateIdleServerRpc();
                     }
                 }
             } else {
