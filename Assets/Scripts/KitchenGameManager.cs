@@ -11,8 +11,10 @@ public class KitchenGameManager : NetworkBehaviour {
 
 
     public event EventHandler OnStateChanged;
-    public event EventHandler OnGamePaused;
-    public event EventHandler OnGameUnpaused;
+    public event EventHandler OnLocalGamePause;
+    public event EventHandler OnLocalGameUnpause;
+    public event EventHandler OnMultiplayerGamePause;
+    public event EventHandler OnMultiplayerGameUnpause;
     public event EventHandler OnLocalPlayerReadyChanged;
 
     private enum State {
@@ -28,13 +30,16 @@ public class KitchenGameManager : NetworkBehaviour {
     private NetworkVariable<float> countdownToStartTimer = new NetworkVariable<float>(3f);
     private NetworkVariable<float> gamePlayingTimer = new NetworkVariable<float>(0f);
     private float gamePlayingTimerMax = 90f;
-    private bool isGamePaused = false;
+    private bool isLocalGamePaused = false;
+    private NetworkVariable<bool> isGamePaused = new NetworkVariable<bool>(false);
     private Dictionary<ulong, bool> playerReadyDictionary;
+    private Dictionary<ulong, bool> playerPauseDictionary;
 
     private void Awake() {
         Instance = this;
 
         playerReadyDictionary = new Dictionary<ulong, bool>();
+        playerPauseDictionary = new Dictionary<ulong, bool>();
     }
 
     private void Start() {
@@ -45,11 +50,25 @@ public class KitchenGameManager : NetworkBehaviour {
     public override void OnNetworkSpawn()
     {
         state.OnValueChanged += State_OnValueChanged;
+        isGamePaused.OnValueChanged += IsGamePaused_OnValueChanged;
     }
 
     private void State_OnValueChanged(State prevValue,State newValue)
     {
         OnStateChanged?.Invoke(this, EventArgs.Empty);
+    }
+    private void IsGamePaused_OnValueChanged(bool prevValue, bool newValue)
+    {
+        if (isGamePaused.Value)
+        {
+            Time.timeScale = 0f;
+            OnMultiplayerGamePause.Invoke(this, EventArgs.Empty);
+        }
+        else
+        {
+            Time.timeScale = 1f;
+            OnMultiplayerGameUnpause.Invoke(this, EventArgs.Empty);
+        }
     }
 
     private void GameInput_OnInteractAction(object sender, EventArgs e) {
@@ -131,16 +150,43 @@ public class KitchenGameManager : NetworkBehaviour {
     }
 
     public void TogglePauseGame() {
-        isGamePaused = !isGamePaused;
-        if (isGamePaused) {
-            Time.timeScale = 0f;
-
-            OnGamePaused?.Invoke(this, EventArgs.Empty);
+        isLocalGamePaused = !isLocalGamePaused;
+        if (isLocalGamePaused) {
+            PauseGameServerRPC();
+            OnLocalGamePause?.Invoke(this, EventArgs.Empty);
         } else {
-            Time.timeScale = 1f;
-
-            OnGameUnpaused?.Invoke(this, EventArgs.Empty);
+            UnpauseGamerServerRPC();
+            OnLocalGameUnpause?.Invoke(this, EventArgs.Empty);
         }
     }
 
+    [ServerRpc(RequireOwnership =false)]
+    public void PauseGameServerRPC(ServerRpcParams serverRpcParams=default)
+    {
+        playerPauseDictionary[serverRpcParams.Receive.SenderClientId] = true;
+
+        TestGamePauseState();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void UnpauseGamerServerRPC(ServerRpcParams serverRpcParams = default)
+    {
+        playerPauseDictionary[serverRpcParams.Receive.SenderClientId] = false;
+
+        TestGamePauseState();
+    }
+
+    private void TestGamePauseState()
+    {
+        foreach(ulong clientID in NetworkManager.Singleton.ConnectedClientsIds)
+        {
+            if(playerPauseDictionary.ContainsKey(clientID) && playerPauseDictionary[clientID])
+            {
+                isGamePaused.Value = true;
+                return;
+            }
+        }
+        //all player unpause
+        isGamePaused.Value = false;
+    }
 }
