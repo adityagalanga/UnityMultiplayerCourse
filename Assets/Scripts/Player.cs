@@ -6,15 +6,17 @@ using UnityEngine;
 
 public class Player : NetworkBehaviour, IKitchenObjectParent {
 
-    public static event EventHandler OnAnyPlayerSpawn;
-    public static event EventHandler OnAnyPickedSomething;
-    public static Player LocalInstance { get; private set; }
 
-    public static void ResetStaticData()
-    {
-        OnAnyPlayerSpawn = null;
-        OnAnyPickedSomething = null;
+    public static event EventHandler OnAnyPlayerSpawned;
+    public static event EventHandler OnAnyPickedSomething;
+
+
+    public static void ResetStaticData() {
+        OnAnyPlayerSpawned = null;
     }
+
+
+    public static Player LocalInstance { get; private set; }
 
 
 
@@ -41,15 +43,14 @@ public class Player : NetworkBehaviour, IKitchenObjectParent {
         GameInput.Instance.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
     }
 
-    public override void OnNetworkSpawn()
-    {
-        if (IsOwner)
-        {
+    public override void OnNetworkSpawn() {
+        if (IsOwner) {
             LocalInstance = this;
         }
 
-        OnAnyPlayerSpawn?.Invoke(this, EventArgs.Empty);
+        OnAnyPlayerSpawned?.Invoke(this, EventArgs.Empty);
     }
+
     private void GameInput_OnInteractAlternateAction(object sender, EventArgs e) {
         if (!KitchenGameManager.Instance.IsGamePlaying()) return;
 
@@ -67,11 +68,10 @@ public class Player : NetworkBehaviour, IKitchenObjectParent {
     }
 
     private void Update() {
-        if (!IsOwner) 
-        {
+        if (!IsOwner) {
             return;
         }
-        //HandleMovementServerAuth();
+
         HandleMovement();
         HandleInteractions();
     }
@@ -103,65 +103,6 @@ public class Player : NetworkBehaviour, IKitchenObjectParent {
         } else {
             SetSelectedCounter(null);
         }
-    }
-    private void HandleMovementServerAuth()
-    {
-        Vector2 inputVector = GameInput.Instance.GetMovementVectorNormalized();
-        HandleMovementServerRPC(inputVector);
-    }
-
-    [ServerRpc(RequireOwnership=false)]
-    private void HandleMovementServerRPC(Vector2 inputVector)
-    {
-        Vector3 moveDir = new Vector3(inputVector.x, 0f, inputVector.y);
-
-        float moveDistance = moveSpeed * Time.deltaTime;
-        float playerRadius = .7f;
-        float playerHeight = 2f;
-        bool canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDir, moveDistance);
-
-        if (!canMove)
-        {
-            // Cannot move towards moveDir
-
-            // Attempt only X movement
-            Vector3 moveDirX = new Vector3(moveDir.x, 0, 0).normalized;
-            canMove = (moveDir.x < -.5f || moveDir.x > +.5f) && !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirX, moveDistance);
-
-            if (canMove)
-            {
-                // Can move only on the X
-                moveDir = moveDirX;
-            }
-            else
-            {
-                // Cannot move only on the X
-
-                // Attempt only Z movement
-                Vector3 moveDirZ = new Vector3(0, 0, moveDir.z).normalized;
-                canMove = (moveDir.z < -.5f || moveDir.z > +.5f) && !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirZ, moveDistance);
-
-                if (canMove)
-                {
-                    // Can move only on the Z
-                    moveDir = moveDirZ;
-                }
-                else
-                {
-                    // Cannot move in any direction
-                }
-            }
-        }
-
-        if (canMove)
-        {
-            transform.position += moveDir * moveDistance;
-        }
-
-        isWalking = moveDir != Vector3.zero;
-
-        float rotateSpeed = 10f;
-        transform.forward = Vector3.Slerp(transform.forward, moveDir, Time.deltaTime * rotateSpeed);
     }
 
     private void HandleMovement() {
@@ -243,8 +184,8 @@ public class Player : NetworkBehaviour, IKitchenObjectParent {
         return kitchenObject != null;
     }
 
-    public NetworkObject GetNetworkObject()
-    {
+
+    public NetworkObject GetNetworkObject() {
         return NetworkObject;
     }
 

@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,20 +10,15 @@ public class SelectedCounterVisual : MonoBehaviour {
 
 
     private void Start() {
-        if(Player.LocalInstance != null)
-        {
+        if (Player.LocalInstance != null) {
             Player.LocalInstance.OnSelectedCounterChanged += Player_OnSelectedCounterChanged;
-        }
-        else
-        {
-            Player.OnAnyPlayerSpawn += Player_OnAnyPlayerSpawned;
+        } else {
+            Player.OnAnyPlayerSpawned += Player_OnAnyPlayerSpawned;
         }
     }
 
-    private void Player_OnAnyPlayerSpawned(object sender, EventArgs e)
-    {
-        if (Player.LocalInstance != null)
-        {
+    private void Player_OnAnyPlayerSpawned(object sender, System.EventArgs e) {
+        if (Player.LocalInstance != null) {
             Player.LocalInstance.OnSelectedCounterChanged -= Player_OnSelectedCounterChanged;
             Player.LocalInstance.OnSelectedCounterChanged += Player_OnSelectedCounterChanged;
         }

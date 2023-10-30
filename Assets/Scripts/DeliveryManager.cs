@@ -29,12 +29,12 @@ public class DeliveryManager : NetworkBehaviour {
     private void Awake() {
         Instance = this;
 
+
         waitingRecipeSOList = new List<RecipeSO>();
     }
 
     private void Update() {
-        if (!IsServer)
-        {
+        if (!IsServer) {
             return;
         }
 
@@ -44,16 +44,18 @@ public class DeliveryManager : NetworkBehaviour {
 
             if (KitchenGameManager.Instance.IsGamePlaying() && waitingRecipeSOList.Count < waitingRecipesMax) {
                 int waitingRecipeSOIndex = UnityEngine.Random.Range(0, recipeListSO.recipeSOList.Count);
-                SpawnNewWaitingRecipeClientRPC(waitingRecipeSOIndex);
+
+                SpawnNewWaitingRecipeClientRpc(waitingRecipeSOIndex);
             }
         }
     }
 
     [ClientRpc]
-    private void SpawnNewWaitingRecipeClientRPC(int waitingRecipeSOIndex)
-    {
+    private void SpawnNewWaitingRecipeClientRpc(int waitingRecipeSOIndex) {
         RecipeSO waitingRecipeSO = recipeListSO.recipeSOList[waitingRecipeSOIndex];
+
         waitingRecipeSOList.Add(waitingRecipeSO);
+
         OnRecipeSpawned?.Invoke(this, EventArgs.Empty);
     }
 
@@ -82,7 +84,8 @@ public class DeliveryManager : NetworkBehaviour {
                 }
 
                 if (plateContentsMatchesRecipe) {
-                    DeliveryCorrectRecipeServerRPC(i);
+                    // Player delivered the correct recipe!
+                    DeliverCorrectRecipeServerRpc(i);
                     return;
                 }
             }
@@ -90,30 +93,26 @@ public class DeliveryManager : NetworkBehaviour {
 
         // No matches found!
         // Player did not deliver a correct recipe
-        DeliveryIncorrectRecipeServerRPC();
+        DeliverIncorrectRecipeServerRpc();
     }
 
-    [ServerRpc(RequireOwnership =false)]
-    private void DeliveryIncorrectRecipeServerRPC()
-    {
-        DeliveryIncorrectRecipeClientRPC();
+    [ServerRpc(RequireOwnership = false)]
+    private void DeliverIncorrectRecipeServerRpc() {
+        DeliverIncorrectRecipeClientRpc();
     }
 
     [ClientRpc]
-    private void DeliveryIncorrectRecipeClientRPC()
-    {
+    private void DeliverIncorrectRecipeClientRpc() {
         OnRecipeFailed?.Invoke(this, EventArgs.Empty);
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void DeliveryCorrectRecipeServerRPC(int waitingRecipeSOListIndex)
-    {
-        DeliveryCorrectRecipeClientRPC(waitingRecipeSOListIndex);
+    private void DeliverCorrectRecipeServerRpc(int waitingRecipeSOListIndex) {
+        DeliverCorrectRecipeClientRpc(waitingRecipeSOListIndex);
     }
 
     [ClientRpc]
-    private void DeliveryCorrectRecipeClientRPC(int waitingRecipeSOListIndex)
-    {
+    private void DeliverCorrectRecipeClientRpc(int waitingRecipeSOListIndex) {
         successfulRecipesAmount++;
 
         waitingRecipeSOList.RemoveAt(waitingRecipeSOListIndex);
@@ -121,6 +120,7 @@ public class DeliveryManager : NetworkBehaviour {
         OnRecipeCompleted?.Invoke(this, EventArgs.Empty);
         OnRecipeSuccess?.Invoke(this, EventArgs.Empty);
     }
+
 
     public List<RecipeSO> GetWaitingRecipeSOList() {
         return waitingRecipeSOList;

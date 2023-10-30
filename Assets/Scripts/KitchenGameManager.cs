@@ -40,7 +40,7 @@ public class KitchenGameManager : MonoBehaviour {
         GameInput.Instance.OnPauseAction += GameInput_OnPauseAction;
         GameInput.Instance.OnInteractAction += GameInput_OnInteractAction;
 
-        //DEBUG TRIGGER GAME
+        // DEBUG TRIGGER GAME START AUTOMATICALLY
         state = State.CountdownToStart;
         OnStateChanged?.Invoke(this, EventArgs.Empty);
     }

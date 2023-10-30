@@ -20,8 +20,7 @@ public class PlayerAnimator : NetworkBehaviour {
     }
 
     private void Update() {
-        if (!IsOwner)
-        {
+        if (!IsOwner) {
             return;
         }
 

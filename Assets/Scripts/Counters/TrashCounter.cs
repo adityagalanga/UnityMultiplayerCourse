@@ -18,19 +18,18 @@ public class TrashCounter : BaseCounter {
     public override void Interact(Player player) {
         if (player.HasKitchenObject()) {
             KitchenObject.DestroyKitchenObject(player.GetKitchenObject());
-            InteractLogicServerRPC();
+
+            InteractLogicServerRpc();
         }
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void InteractLogicServerRPC()
-    {
-        InteractLogicClientRPC();
+    private void InteractLogicServerRpc() {
+        InteractLogicClientRpc();
     }
 
     [ClientRpc]
-    private void InteractLogicClientRPC()
-    {
+    private void InteractLogicClientRpc() {
         OnAnyObjectTrashed?.Invoke(this, EventArgs.Empty);
     }
 

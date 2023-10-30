@@ -52,8 +52,8 @@ public class BaseCounter : NetworkBehaviour, IKitchenObjectParent {
     public bool HasKitchenObject() {
         return kitchenObject != null;
     }
-    public NetworkObject GetNetworkObject()
-    {
+
+    public NetworkObject GetNetworkObject() {
         return NetworkObject;
     }
 
