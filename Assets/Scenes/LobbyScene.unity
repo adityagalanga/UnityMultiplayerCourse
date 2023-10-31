@@ -228,6 +228,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   kitchenObjectListSO: {fileID: 11400000, guid: 92e027e5647eb6a41b39021ca0635fb7,
     type: 2}
+  playerColorList:
+  - {r: 1, g: 0, b: 0, a: 1}
+  - {r: 0.71568644, g: 1, b: 0, a: 1}
+  - {r: 0, g: 1, b: 0.16385317, a: 1}
+  - {r: 0, g: 1, b: 0.68479824, a: 1}
+  - {r: 0, g: 0.23213434, b: 1, a: 1}
+  - {r: 0.71525383, g: 0, b: 1, a: 1}
+  - {r: 1, g: 0, b: 0.68492126, a: 1}
+  - {r: 1, g: 0.42058405, b: 0, a: 1}
+  - {r: 1, g: 1, b: 1, a: 1}
+  - {r: 0.1509434, g: 0.15008901, b: 0.15008901, a: 1}
 --- !u!4 &75008627
 Transform:
   m_ObjectHideFlags: 0
