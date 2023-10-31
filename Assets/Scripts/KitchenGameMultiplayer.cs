@@ -21,11 +21,26 @@ public class KitchenGameMultiplayer : NetworkBehaviour {
     public event EventHandler OnFailedToJoinGame;
     public event EventHandler OnPlayerDataNetworkListChanged;
 
+    private string playerName;
+
     private void Awake() {
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        playerName = PlayerPrefs.GetString("playerNameMultiplayer","PlayerName"+UnityEngine.Random.Range(10,100));
+
         playerDataNetworkList = new NetworkList<PlayerData>();
         playerDataNetworkList.OnListChanged += PlayerDataNetworkList_OnListChanged;
+    }
+
+    public string GetPlayerName()
+    {
+        return playerName;
+    }
+
+    public void SetPlayerName(string name)
+    {
+        this.playerName = name;
+        PlayerPrefs.SetString("playerNameMultiplayer", playerName);
     }
 
     private void PlayerDataNetworkList_OnListChanged(NetworkListEvent<PlayerData> changeEvent)
@@ -59,7 +74,9 @@ public class KitchenGameMultiplayer : NetworkBehaviour {
         {
             clientID = clientiD,
             colorID = GetFirstUnusedColorID()
-        }); ;
+        });
+
+        SetPlayerNameServerRPC(GetPlayerName());
     }
 
     private void NetworkManage_ConnecteionApprovalCallback(NetworkManager.ConnectionApprovalRequest connectionApprovalRequest, NetworkManager.ConnectionApprovalResponse connectionApprovalResponse)
@@ -95,11 +112,27 @@ public class KitchenGameMultiplayer : NetworkBehaviour {
     public void StartClient()
     {
         OnTryingToJoinGame?.Invoke(this, EventArgs.Empty);
-        NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
+        NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_Client_OnClientConnectedCallback;
+        NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_Client_OnClientDisconnectCallback;
         NetworkManager.Singleton.StartClient();
     }
 
-    private void NetworkManager_OnClientDisconnectCallback(ulong obj)
+    private void NetworkManager_Client_OnClientConnectedCallback(ulong obj)
+    {
+        SetPlayerNameServerRPC(GetPlayerName());
+    }
+
+    [ServerRpc(RequireOwnership =false)]
+    private void SetPlayerNameServerRPC(string playerName, ServerRpcParams serverRpcParams = default)
+    {
+        int playerDataIndex = GetPlayerDataIndexFromClientID(serverRpcParams.Receive.SenderClientId);
+
+        PlayerData playerData = playerDataNetworkList[playerDataIndex];
+        playerData.playerName = playerName;
+        playerDataNetworkList[playerDataIndex] = playerData;
+    }
+
+    private void NetworkManager_Client_OnClientDisconnectCallback(ulong obj)
     {
         OnFailedToJoinGame?.Invoke(this, EventArgs.Empty);
     }
