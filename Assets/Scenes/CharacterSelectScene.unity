@@ -1432,7 +1432,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Host Kick You
+  m_text: You Disconnected
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1848,6 +1848,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 885272686544631941, guid: 9b6f8b22d155fd043834bc732a378ce2,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 9b6f8b22d155fd043834bc732a378ce2, type: 3}
 --- !u!1001 &1034945834
 PrefabInstance:
@@ -2183,6 +2187,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 885272686544631941, guid: 9b6f8b22d155fd043834bc732a378ce2,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 9b6f8b22d155fd043834bc732a378ce2, type: 3}
 --- !u!1001 &1187816200
 PrefabInstance:
@@ -2257,6 +2265,10 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3412497944391429579, guid: 9b6f8b22d155fd043834bc732a378ce2,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 885272686544631941, guid: 9b6f8b22d155fd043834bc732a378ce2,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 0}
@@ -4336,6 +4348,10 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3412497944391429579, guid: 9b6f8b22d155fd043834bc732a378ce2,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 885272686544631941, guid: 9b6f8b22d155fd043834bc732a378ce2,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 0}
